@@ -21,7 +21,6 @@ namespace WpfApp1.Data
             var config = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("appsetting.json", false, true).Build();
-
             var optionsBuilder = new DbContextOptionsBuilder<EFDbContext>();
             var connectionStr = config.GetConnectionString(nameof(EFDbContext));
             optionsBuilder.UseSqlite(connectionStr);
