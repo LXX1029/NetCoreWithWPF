@@ -58,6 +58,20 @@ namespace WpfApp1
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            var list = this._context.Products.Include(p => p.Category).ToList();
+            var lookUp = list.ToLookup(p => p.CategoryId);
+            var sb = new StringBuilder();
+            foreach (var item in lookUp)
+            {
+                sb.AppendLine(item.Key.ToString());
+                foreach (var product in item)
+                {
+                    sb.AppendLine($"{product.ProductId}-{product.Category.Name}-{product.Name}");
+                }
+            }
+            Console.WriteLine(sb.ToString());
+
+
             this._logger.LogInformation("程序已启动");
             if (!this._cache.TryGetValue(nameof(MySettings), out MySettings _))
             {
@@ -82,7 +96,7 @@ namespace WpfApp1
                         var product1 = context.Products.Find(2);
                         var price1 = new Random().Next(10);
                         this._logger.LogInformation($"price1:{price1.ToString()}");
-                        product1.Price =  price1;
+                        product1.Price = price1;
                         int result1 = context.SaveChanges();
                         transaction.Commit();
                     }
@@ -102,7 +116,7 @@ namespace WpfApp1
                 try
                 {
                     var price2 = new Random().Next(10);
-                    product.Price =  price2;
+                    product.Price = price2;
                     this._logger.LogInformation($"price2:{price2}");
                     int result = this._context.SaveChanges();
                     savedData = true;
@@ -111,12 +125,6 @@ namespace WpfApp1
                 {
                     if (ex is DbUpdateConcurrencyException dbUpdate)
                     {
-                        //dbUpdate.Entries.Single().Reload();
-                        ////dbUpdate.Entries.Single().State = EntityState.Modified;
-                        //this._context.SaveChanges();
-                        //savedData = true;
-                        //this._logger.LogDebug(ex.Message);
-
                         foreach (var item in dbUpdate.Entries)
                         {
                             if (item.Entity is Product entry)
